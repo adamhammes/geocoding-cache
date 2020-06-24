@@ -19,7 +19,7 @@ CREATE TABLE GeocodeHit (
     Latitude REAL NOT NULL,
     Longitude REAL NOT NULL,
     PostalCode TEXT NOT NULL,
-    StreetNumber TEXT NOT NULL,
+    StreetNumber TEXT,
     -- The name of the service used to geocode this entry
     QueryProvider TEXT NOT NULL,
     LastQueriedAt TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP

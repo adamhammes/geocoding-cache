@@ -73,9 +73,6 @@ def google(address: str) -> GeocodeResult:
     result = response["results"][0]
     geometry = result["geometry"]
 
-    if geometry["location_type"] != "ROOFTOP":
-        return GeocodeMiss.ImpreciseAddress
-
     street_number, postal_code = None, None
     for address_part in result["address_components"]:
         if "street_number" in address_part["types"]:
@@ -84,7 +81,7 @@ def google(address: str) -> GeocodeResult:
         if "postal_code" in address_part["types"]:
             postal_code = address_part["long_name"]
 
-    if street_number is None or postal_code is None:
+    if postal_code is None or len(postal_code) != 7:
         return GeocodeMiss.ImpreciseAddress
 
     return GeocodeHit(
