@@ -7,10 +7,16 @@ import dotenv
 from flask import current_app, Flask, g, request
 import requests
 
+import geocoding_cache.backup
 import geocoding_cache.db
 import geocoding_cache.providers
 
 app = Flask(__name__)
+
+
+@app.cli.command()
+def backup():
+    geocoding_cache.backup.backup_db(get_db())
 
 
 class CacheType(str, enum.Enum):
