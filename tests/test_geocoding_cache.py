@@ -45,7 +45,11 @@ def test_returns_bad_request_on_missing_address(client, provider):
 def test_miss(client, provider):
     provider.return_value = GeocodeMiss.ImpreciseAddress
     address_query = "Quebec City, Québec, Canada"
-    expected_result = {"result": None, "status": GeocodeMiss.ImpreciseAddress.value}
+    expected_result = {
+        "result": None,
+        "status": GeocodeMiss.ImpreciseAddress.value,
+        "cache_type": "MISS",
+    }
 
     response = client.get("/", query_string={"address": address_query})
     provider.assert_called_once_with(address_query)
@@ -61,6 +65,7 @@ def test_miss(client, provider):
     assert cached_result == {
         "result": None,
         "status": GeocodeMiss.ImpreciseAddress.value,
+        "cache_type": "HIT",
     }
 
 
@@ -76,7 +81,7 @@ def test_hit(client, provider):
     )
 
     provider.return_value = hit
-    expected_result = {"status": "OK", "result": hit._asdict()}
+    expected_result = {"status": "OK", "result": hit._asdict(), "cache_type": "MISS"}
 
     response = client.get("/", query_string={"address": query})
     provider.assert_called_once_with(query)
@@ -90,4 +95,4 @@ def test_hit(client, provider):
     assert cached_response.status_code == 200
 
     result = json.loads(cached_response.data)
-    assert result == expected_result
+    assert result == {**expected_result, "cache_type": "HIT"}

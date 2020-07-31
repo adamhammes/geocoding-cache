@@ -1,3 +1,4 @@
+import enum
 import os
 import sqlite3
 import urllib.request
@@ -10,6 +11,11 @@ import geocoding_cache.db
 import geocoding_cache.providers
 
 app = Flask(__name__)
+
+
+class CacheType(str, enum.Enum):
+    Miss = "MISS"
+    Hit = "HIT"
 
 
 def get_provider():
@@ -39,21 +45,31 @@ def hello():
     raw_address = request.args.get("address")
 
     if raw_address is None:
-        return {"status": "BAD_REQUEST", "result": None}, 400
+        return {"status": "BAD_REQUEST", "result": None, "cache_type": None}, 400
 
     connection = get_db()
 
     geocode_result = geocoding_cache.db.fetch_result(connection, raw_address)
+    cache_type = CacheType.Hit
     if geocode_result is None:
+        cache_type = CacheType.Miss
         geocode_result = get_provider()(raw_address)
         geocoding_cache.db.store_result(connection, raw_address, geocode_result)
 
     connection.commit()
 
     if geocode_result.is_miss():
-        return {"status": geocode_result.value, "result": None}
+        return {
+            "status": geocode_result.value,
+            "result": None,
+            "cache_type": cache_type,
+        }
     else:
-        return {"status": "OK", "result": geocode_result._asdict()}
+        return {
+            "status": "OK",
+            "result": geocode_result._asdict(),
+            "cache_type": cache_type,
+        }
 
 
 @app.teardown_appcontext
