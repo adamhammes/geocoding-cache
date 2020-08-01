@@ -19,8 +19,8 @@ def backup_db(source: sqlite3.Connection):
 
     s3_client = boto3.client("s3")
 
-    day_of_week = datetime.datetime.today().weekday()
-    object_name = f"geocoding_cache/{day_of_week}.sqlite3"
+    day_of_month = datetime.datetime.today().day
+    object_name = f"geocoding_cache/{day_of_month:02}.sqlite3"
 
     print("Uploading to s3...")
     s3_client.upload_fileobj(in_memory_db, "kijiji-apartments", object_name)
