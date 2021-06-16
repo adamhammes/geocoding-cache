@@ -1,5 +1,5 @@
 #!/bin/sh
-set -euxo pipefail
+set -euo pipefail
 
 . .env
 python -m flask run
