@@ -2,4 +2,4 @@
 set -euo pipefail
 
 . .env
-python -m flask run
+./venv/bin/python -m flask run
