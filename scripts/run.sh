@@ -2,4 +2,4 @@
 set -euo pipefail
 
 . .env
-./venv/bin/python -m flask run
+FLASK_APP=geocoding_cache/server ./venv/bin/python -m flask run
